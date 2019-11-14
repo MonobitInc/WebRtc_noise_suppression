@@ -61,7 +61,7 @@ int main()
 	vector<vector<float>> temp_out{ data_out };
 	af.setAudioBuffer(temp_out);
 	af.samples.push_back(data_out);
-	af.save(" 3 bands splitting sync output 2 .wav");
+	af.save("3_bands_splitting_sync_output.wav");
 	//vector<vector<float>> three_band(3);
 	//for (auto &per_band : three_band) {
 	//	per_band.assign(160,0);
