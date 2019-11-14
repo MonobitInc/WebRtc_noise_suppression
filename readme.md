@@ -22,6 +22,15 @@ For more details, please find https://chromium.googlesource.com/external/webrtc/
 
 ------
 
+
+## Compile on linux
+1. compile and install [gtest](https://github.com/google/googletest/tree/master/googletest)
+2. compile splitter
+```sh
+cd my_splitting_filter
+make
+```
+
 ## Test cases 
 
 input :
