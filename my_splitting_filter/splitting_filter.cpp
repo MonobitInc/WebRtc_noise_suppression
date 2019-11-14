@@ -9,8 +9,7 @@
 #include "audio_util.h"
 using namespace std;
 #define TEST_32K
-#define TEST_48K
-
+// #define TEST_48K
 
 int main()
 {
@@ -32,6 +31,32 @@ int main()
 	//	cout << "Float data: " << data[i] << "  Int16 data: " << webrtc::FloatToFloatS16(data[i]) <<endl;
 	//}
 	cout << " \n Next test:\n";
+
+#ifdef TEST_32K
+	vector<float> data_f(data.begin(), data.begin() + 320);
+	vector<int16_t> data_i(320);
+	webrtc::FloatToS16(&data_f[0], 320,&data_i[0] );
+	//for (size_t i = 0; i < data_f.size(); i++)
+	//{
+	//	cout << "Float data: " << data_f[i] << "  Int16 data: " << data_i[i] << endl;
+	//}
+	webrtc::TwoBandsStates TwoBands;
+	vector<int16_t> data_i_l(160);
+	vector<int16_t> data_i_h(160);
+
+	vector<int16_t> data_i_in(data_i);
+	// analysis
+	WebRtcSpl_AnalysisQMF(&data_i[0], 320, &data_i_l[0], &data_i_h[0], TwoBands.analysis_state1, TwoBands.analysis_state2);
+	// Two bands process
+	vector<int16_t> data_i_out(320);
+	// synthesis
+	WebRtcSpl_SynthesisQMF(&data_i_l[0], &data_i_h[0], 160, &data_i_out[0], TwoBands.synthesis_state1, TwoBands.synthesis_state2);
+	for (size_t i = 0; i < 320; i++)
+	{
+		cout <<"Original data : "<< webrtc::S16ToFloat(data_i_in[i]) <<" data_in : " <<webrtc::S16ToFloat(data_i[i]) << " data_out : " << webrtc::S16ToFloat(data_i_out[i]) << endl;
+	}
+#endif // TEST_32K
+
 #ifdef TEST_48K
 
 	auto iter = data.begin();
@@ -69,32 +94,6 @@ int main()
 
 
 #endif // TEST_48K
-
-#ifdef TEST_32K
-
-	vector<float> data_f(data.begin(), data.begin() + 320);
-	vector<int16_t> data_i(320);
-	webrtc::FloatToS16(&data_f[0], 320,&data_i[0] );
-	//for (size_t i = 0; i < data_f.size(); i++)
-	//{
-	//	cout << "Float data: " << data_f[i] << "  Int16 data: " << data_i[i] << endl;
-	//}
-	webrtc::TwoBandsStates TwoBands;
-	vector<int16_t> data_i_l(160);
-	vector<int16_t> data_i_h(160);
-
-	vector<int16_t> data_i_in(data_i);
-	// analysis
-	WebRtcSpl_AnalysisQMF(&data_i[0], 320, &data_i_l[0], &data_i_h[0], TwoBands.analysis_state1, TwoBands.analysis_state2);
-	// Two bands process
-	vector<int16_t> data_i_out(320);
-	// synthesis
-	WebRtcSpl_SynthesisQMF(&data_i_l[0], &data_i_h[0], 160, &data_i_out[0], TwoBands.synthesis_state1, TwoBands.synthesis_state2);
-	for (size_t i = 0; i < 320; i++)
-	{
-		cout <<"Original data : "<< webrtc::S16ToFloat(data_i_in[i]) <<" data_in : " <<webrtc::S16ToFloat(data_i[i]) << " data_out : " << webrtc::S16ToFloat(data_i_out[i]) << endl;
-	}
-#endif // TEST_32K
 
     return 0;
 }
