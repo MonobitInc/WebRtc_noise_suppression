@@ -46,8 +46,6 @@ RTC_NORETURN void rtc_FatalMessage(const char* file, int line, const char* msg);
 //#include "rtc_base/system/inline.h"
 #include "safe_compare.h"
 #include "inline.h"
-#define WEBRTC_WIN   // 2018Äê12ÔÂ5ÈÕ14:19:02 add
-
 
 
 // The macros here print a message to stderr and abort under various
