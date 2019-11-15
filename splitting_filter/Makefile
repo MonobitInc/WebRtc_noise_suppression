@@ -1,7 +1,8 @@
 
 target:splitter
 
-ROOT_DIR=../
+ROOT_DIR=..
+COMMON_ROOT=${ROOT_DIR}/common
 
 CXX = g++ 
 
@@ -9,8 +10,8 @@ INCS+=-I test/
 INCS+=-I rtc_base/
 OBJS+=rtc_base/checks.o
 
-INCS+=-I AudioFile/
-OBJS+=AudioFile/AudioFile.o
+INCS+=-I ${COMMON_ROOT}
+OBJS+=${COMMON_ROOT}/AudioFile/AudioFile.o
 
 INCS+=-I splitting_filter/
 TMP_SRCS=$(wildcard splitting_filter/*.cc)

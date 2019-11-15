@@ -2,7 +2,7 @@
 //
 
 #include <iostream>
-#include "AudioFile.h"
+#include "AudioFile/AudioFile.h"
 #include "signal_processing_library.h"
 #include "splitting_filter.h"
 #include "three_band_filter_bank.h"
