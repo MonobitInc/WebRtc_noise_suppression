@@ -19,11 +19,10 @@ noise_sup:noise_sup.o ${OBJS} libwebrtc.a
 
 
 .PHONY:clean
-clean:
+clean:com_clean
 	rm -f noise_sup
 	rm -f libwebrtc.a
 	find . -name "*.o" -type f -delete
-	find ${COMMON_ROOT} -name "*.o" -type f -delete
 
 
 

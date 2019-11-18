@@ -29,9 +29,10 @@ int main()
 	std::cout << "WebRtc noise suppression \n";
 
 	AudioFile<double> af;
-	af.load("audio_with_noise_16k_stereo.wav");
+	af.load("../assets/audio_with_noise_16k_stereo.wav");
+    af.printSummary();
 
-    NsHandle *ns = nsInit(16000, kHigh);
+    NsHandle *ns = nsInit(af.getSampleRate(), kHigh);
     auto res = nsProcess(ns, af);
 
 	af.setAudioBuffer(res);

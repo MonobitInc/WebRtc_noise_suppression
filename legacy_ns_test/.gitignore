@@ -1,3 +1,4 @@
+*.wav
 noise_sup_out.wav
 noise_sup
 libwebrtc.a
