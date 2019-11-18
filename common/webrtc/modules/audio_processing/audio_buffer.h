@@ -18,14 +18,15 @@
 #include <vector>
 
 #include "common_audio/channel_buffer.h"
+#include "VAFrame/VAFrame.h"
 
 namespace webrtc {
-
 class PushSincResampler;
 class SplittingFilter;
 
 enum Band { kBand0To8kHz = 0, kBand8To16kHz = 1, kBand16To24kHz = 2 };
 
+// 默认每个buffer的大小是10ms的数据长度
 // Stores any audio data in a way that allows the audio processing module to
 // operate on it in a controlled manner.
 class AudioBuffer {
@@ -107,9 +108,11 @@ class AudioBuffer {
   }
 
   // Copies data into the buffer.
+  void CopyFrom(const VAFrameFlt *frame);
 
   // Copies data from the buffer.
-  void CopyTo(AudioBuffer* buffer) const;
+  void CopyTo(AudioBuffer *buffer) const;
+  void CopyTo(VAFrameFlt *frame) const;
 
   // Splits the buffer data into frequency bands.
   void SplitIntoFrequencyBands();
