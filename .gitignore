@@ -1,5 +1,6 @@
 
 
+libwebrtc.a
 *.o
 .*.swp
 tags
