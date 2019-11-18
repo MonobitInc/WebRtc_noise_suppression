@@ -23,20 +23,32 @@ using namespace std;
 NsHandle* nsInit(int sample_rate, nsLevel);
 vector<vector<double>> nsProcess(NsHandle* nsHandle, AudioFile<double> &audio_file);
 
-int main()
+int main(int argc, char **argv)
 {
+    char defaultFileIn[] = "../assets/audio_with_noise_16k_stereo.wav";
+    char defaultFileOut[] = "default_out.wav";
+    char *fileIn = defaultFileIn;
+    char *fileOut = defaultFileOut;
+    if (argc >= 2) {
+        fileIn = argv[1];
+    }
+    if (argc >= 3) {
+        fileOut = argv[2];
+    }
 	// NsHandle *nsHandle = WebRtcNs_Create();
 	std::cout << "WebRtc noise suppression \n";
 
 	AudioFile<double> af;
-	af.load("../assets/audio_with_noise_16k_stereo.wav");
+    printf("In file name: %s\n", fileIn);
+    printf("Out file name: %s\n", fileOut);
+	af.load(fileIn);
     af.printSummary();
 
     NsHandle *ns = nsInit(af.getSampleRate(), kHigh);
     auto res = nsProcess(ns, af);
 
 	af.setAudioBuffer(res);
-	af.save("noise_sup_out.wav");
+	af.save(fileOut);
     return 0;
 }
 
