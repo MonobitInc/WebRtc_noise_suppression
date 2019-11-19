@@ -1,4 +1,7 @@
 
+## WebRtc noise suppression
+origin repo: [jagger2048/WebRtc_noise_suppression](https://github.com/jagger2048/WebRtc_noise_suppression)
+This project is a standalone noise suppression module which reference from google's official webrtc project. I rewraped it so that it can be used in other places. The files used in this project in sync with official webrtc project respository.
 
 # Code Structure
 ## common
