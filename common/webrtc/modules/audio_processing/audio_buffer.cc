@@ -201,8 +201,6 @@ void AudioBuffer::CopyFrom(const VAFrameFlt* frame) {
         input_resamplers_[0]->Resample(interleaved, input_num_frames_,
                                        data_->channels()[0],
                                        buffer_num_frames_);
-        FloatToFloatS16(data_->channels()[0], buffer_num_frames_,
-                                        data_->channels()[0]);
       } else {
         FloatToFloatS16(interleaved, input_num_frames_, data_->channels()[0]);
       }
