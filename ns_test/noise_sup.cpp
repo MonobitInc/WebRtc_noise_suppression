@@ -17,7 +17,6 @@ using NSupressor = std::shared_ptr<NoiseSuppressor>;
 
 vector<vector<float>> nsProcess(NSupressor nsHandle, AudioFileFlt *audio_file, float gain)
 {
-	bool isMono = true;
     int channelNum = audio_file->getNumChannels();
 	vector<vector<float>> output(channelNum);
 
@@ -34,8 +33,8 @@ vector<vector<float>> nsProcess(NSupressor nsHandle, AudioFileFlt *audio_file, f
 
 	//	load noise suppression module
     // 每个Frame大小为10ms数据，与AudioBuffer保持一致
-	const size_t samples = sample_rate / 100;
-	size_t total_frames = (total_samples / samples);			// 处理的帧数
+	const int samples = sample_rate / 100;
+	int total_frames = (total_samples / samples);			// 处理的帧数
 
 	for (int i = 0; i < total_frames; i++) {
         VAFrameFlt input_buffer(sample_rate), output_buffer(sample_rate);
@@ -53,10 +52,16 @@ vector<vector<float>> nsProcess(NSupressor nsHandle, AudioFileFlt *audio_file, f
             }
 		}
         ab.CopyFrom(&input_buffer);
+        if (ab.num_bands() > 1) {
+            ab.SplitIntoFrequencyBands();
+        }
 
         nsHandle->Analyze(ab);
         nsHandle->Process(&ab);
 
+        if (ab.num_bands() > 1) {
+            ab.MergeFrequencyBands();
+        }
         ab.CopyTo(&output_buffer);
         for (int c = 0; c < channelNum; c++) {
             for (int i = 0; i < samples; i++) {
@@ -83,7 +88,6 @@ int main(int argc, char **argv)
 
 	AudioFile<float> af;
     printf("In file name: %s\n", fileIn);
-    printf("Out file name: %s\n", fileOut);
 	af.load(fileIn);
     af.printSummary();
 
@@ -91,10 +95,12 @@ int main(int argc, char **argv)
     NsConfig cfg;
     cfg.target_level = NsConfig::SuppressionLevel::k18dB;
     ns = std::make_unique<NoiseSuppressor>(cfg, af.getSampleRate(), af.getNumChannels());
-    auto res = nsProcess(ns, &af, 4); // +6dB
+    // auto res = nsProcess(ns, &af, 4); // +6dB
+    auto res = nsProcess(ns, &af, 1); // +0dB
 
 	af.setAudioBuffer(res);
 	af.save(fileOut);
+    printf("Out file name: %s\n", fileOut);
     return 0;
 }
 

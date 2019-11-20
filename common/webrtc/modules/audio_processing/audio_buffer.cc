@@ -201,6 +201,8 @@ void AudioBuffer::CopyFrom(const VAFrameFlt* frame) {
         input_resamplers_[0]->Resample(interleaved, input_num_frames_,
                                        data_->channels()[0],
                                        buffer_num_frames_);
+        FloatToFloatS16(data_->channels()[0], buffer_num_frames_,
+                                      data_->channels()[0]);
       } else {
         FloatToFloatS16(interleaved, input_num_frames_, data_->channels()[0]);
       }
@@ -229,13 +231,15 @@ void AudioBuffer::CopyFrom(const VAFrameFlt* frame) {
                                        data_->channels()[0],
                                        buffer_num_frames_);
       }
+      FloatToFloatS16(data_->channels()[0], buffer_num_frames_,
+                                    data_->channels()[0]);
     }
   } else {
-    auto deinterleave_channel = [](size_t channel, size_t num_channels,
+    auto copy_channel = [](size_t channel, size_t num_channels,
                                    size_t samples_per_channel, const float* x,
                                    float* y) {
       for (size_t j = 0; j < samples_per_channel; ++j) {
-        y[j] = x[j];
+        y[j] = FloatToFloatS16(x[j]);
       }
     };
 
@@ -243,7 +247,7 @@ void AudioBuffer::CopyFrom(const VAFrameFlt* frame) {
       std::array<float, kMaxSamplesPerChannel> float_buffer;
       for (size_t i = 0; i < num_channels_; ++i) {
         const float* interleaved = &afbufs[i][0];
-        deinterleave_channel(i, num_channels_, input_num_frames_, interleaved,
+        copy_channel(i, num_channels_, input_num_frames_, interleaved,
                              float_buffer.data());
         input_resamplers_[i]->Resample(float_buffer.data(), input_num_frames_,
                                        data_->channels()[i],
@@ -252,7 +256,7 @@ void AudioBuffer::CopyFrom(const VAFrameFlt* frame) {
     } else {
       for (size_t i = 0; i < num_channels_; ++i) {
         const float* interleaved = &afbufs[i][0];
-        deinterleave_channel(i, num_channels_, input_num_frames_, interleaved,
+        copy_channel(i, num_channels_, input_num_frames_, interleaved,
                              data_->channels()[i]);
       }
     }
@@ -267,7 +271,6 @@ void AudioBuffer::CopyTo(VAFrameFlt* frame) const {
 
   AudioFileFlt::AudioBuffer &afbufs = frame->buf;
   if (num_channels_ == 1) {
-    float* interleaved = &afbufs[0][0];
     std::array<float, kMaxSamplesPerChannel> float_buffer;
 
     if (resampling_required) {
@@ -278,23 +281,24 @@ void AudioBuffer::CopyTo(VAFrameFlt* frame) const {
         resampling_required ? float_buffer.data() : data_->channels()[0];
 
     if (frame->getNumChannels() == 1) {
+      float* interleaved = &afbufs[0][0];
       for (size_t j = 0; j < output_num_frames_; ++j) {
         interleaved[j] = FloatS16ToFloat(deinterleaved[j]);
       }
     } else {
-      for (size_t i = 0, k = 0; i < output_num_frames_; ++i) {
+      for (size_t i = 0; i < output_num_frames_; ++i) {
         float tmp = FloatS16ToFloat(deinterleaved[i]);
-        for (size_t j = 0; j < frame->getNumChannels(); ++j, ++k) {
-          interleaved[k] = tmp;
+        for (size_t j = 0; j < frame->getNumChannels(); ++j) {
+          afbufs[j][i] = tmp;
         }
       }
     }
   } else {
-    auto interleave_channel = [](size_t channel, size_t num_channels,
+    auto copy_channel = [](size_t channel, size_t num_channels,
                                  size_t samples_per_channel, const float* x,
                                  float* y) {
       for (size_t k = 0; k < samples_per_channel; ++k) {
-        y[k] = x[k];
+        y[k] = FloatS16ToFloat(x[k]);
       }
     };
 
@@ -305,13 +309,13 @@ void AudioBuffer::CopyTo(VAFrameFlt* frame) const {
         output_resamplers_[i]->Resample(data_->channels()[i],
                                         buffer_num_frames_, float_buffer.data(),
                                         output_num_frames_);
-        interleave_channel(i, frame->getNumChannels(), output_num_frames_,
+        copy_channel(i, frame->getNumChannels(), output_num_frames_,
                            float_buffer.data(), interleaved);
       }
     } else {
       for (size_t i = 0; i < num_channels_; ++i) {
         float* interleaved = &afbufs[i][0];
-        interleave_channel(i, frame->getNumChannels(), output_num_frames_,
+        copy_channel(i, frame->getNumChannels(), output_num_frames_,
                            data_->channels()[i], interleaved);
       }
     }

@@ -10,7 +10,8 @@ include ../common/MakeCom.mk
 
 LDLIBS += -lgtest -lpthread
 
-CFLAGS += ${INCS} -g
+CFLAGS += ${INCS} -Wall -Werror -g
+CFLAGS += -Wno-error=sign-compare
 CFLAGS += -DWEBRTC_NS_FLOAT -DWEBRTC_POSIX
 CXXFLAGS += ${CFLAGS} -std=c++14
 
