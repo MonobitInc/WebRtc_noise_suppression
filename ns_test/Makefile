@@ -8,11 +8,12 @@ ROOT_DIR = ..
 COMMON_ROOT = ${ROOT_DIR}/common
 include ../common/MakeCom.mk
 
-LDLIBS += -lgtest -lpthread
+LDLIBS += -lpthread ../libgtest_mac.a
 
 CFLAGS += ${INCS} -Wall -Werror -g
 CFLAGS += -Wno-error=sign-compare
-CFLAGS += -DWEBRTC_NS_FLOAT -DWEBRTC_POSIX
+CFLAGS += -DWEBRTC_NS_FLOAT -DWEBRTC_POSIX -I../../AEC3/base/abseil
+
 CXXFLAGS += ${CFLAGS} -std=c++14
 
 noise_sup:noise_sup.o ${OBJS} libwebrtc.a
